@@ -1,11 +1,12 @@
 import { useForm } from '@mantine/form'
-import { Modal, Button, Group, Center, TextInput, Textarea, MantineProvider } from '@mantine/core'
+import { Modal, Button, Group, Center, TextInput, Textarea } from '@mantine/core'
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
-import { ENDPOINT } from '../App';
+import { ENDPOINT, ITodo } from '../App';
+import { KeyedMutator} from 'swr';
 
 
-function AddTodo({mutate: KeyedMutator}) {
-    const [opened, { open, close }] = useDisclosure(true);
+function AddTodo({mutate}: {mutate:KeyedMutator<ITodo[]>}) {
+    const [opened, { open, close }] = useDisclosure(false);
     const isMobile = useMediaQuery('(max-width: 50em)');
 
     const form = useForm({
@@ -15,7 +16,7 @@ function AddTodo({mutate: KeyedMutator}) {
         }
     })
 
-    function createTodo(values:string, body:string) {
+    async function createTodo(values:{title:string, body:string}) {
         const updated = await fetch(`${ENDPOINT}/api/todos`, {
             method:"POST",
             headers:{
@@ -23,8 +24,9 @@ function AddTodo({mutate: KeyedMutator}) {
             },
             body: JSON.stringify(values)
         }).then((response) => response.json())
+        mutate(updated)
         form.reset()
-        close
+        close()
     }
 
     return (
@@ -49,8 +51,8 @@ function AddTodo({mutate: KeyedMutator}) {
                         mb={12}
                         label="Body"
                         placeholder='More...'
-                        {...form.getInputProps("title")} />
-                    <Button>Create todo</Button>
+                        {...form.getInputProps("body")} />
+                    <Button type='submit'>Create todo</Button>
                 </form>
             </Modal>
             <Group pos={Center}>

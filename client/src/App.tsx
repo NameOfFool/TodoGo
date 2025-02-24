@@ -8,27 +8,26 @@ import AddTodo from './components/AddTodo'
 export const ENDPOINT = 'http://localhost:8000'
 
 export interface ITodo {
-  id:number
-  title:string
-  body:string
-  done:boolean
+  id: number
+  title: string
+  body: string
+  done: boolean
 }
 
-const fetcher = (url: string) => fetch(`${ENDPOINT}/${url}`).then(response => {
-  response.json()
-})
+const fetcher = (url: string) =>
+  fetch(`${ENDPOINT}/${url}`).then(response => response.json())
 
 function App() {
 
-  const { data, mutate } = useSWR('api/todos', fetcher)
+  const { data, mutate } = useSWR<ITodo[]>('api/todos', fetcher)
 
   return (
-    
-      <MantineProvider>
-        <Box>{JSON.stringify(data)}</Box>        
-        <AddTodo mutate={mutate}/>
-      </MantineProvider>
-    
+
+    <MantineProvider>
+      <Box>{JSON.stringify(data)}</Box>
+      <AddTodo mutate={mutate} />
+    </MantineProvider>
+
   )
 }
 
